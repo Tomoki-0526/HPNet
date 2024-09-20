@@ -106,9 +106,9 @@ class MyTrainer(Trainer):
             loss_dict['type_miou'] = miou
 
             # visualization
-            xyz = inputs_xyz_sub.cpu().numpy().reshape(-1, 3)
-            prim_type = type_per_point.cpu().numpy().reshape(-1, 1)
-            inst_label = cluster_pred.cpu().numpy().reshape(-1, 1)
+            xyz = inputs_xyz_sub.cpu().numpy().squeeze(0).T
+            prim_type = type_per_point.cpu().numpy().squeeze(0).argmax(1).reshape(-1, 1)
+            inst_label = cluster_pred.cpu().numpy().T
             labeled_cloud = np.concatenate((xyz, prim_type, inst_label), axis=1)
             vis_path = os.path.join(self.VIS_DIR, '{}.txt'.format(str(batch_idx).zfill(3)))
             print('save cloud to: {}'.format(vis_path))
