@@ -26,6 +26,13 @@ class Trainer(object):
         self.build_dataloader()
         self.build_model_optimizer()
 
+        # stat
+        self.feat_loss = []
+        self.nnl_loss = []
+        self.param_loss = []
+        self.miou = []
+        self.type_miou = []
+
         # TFBoard visualizer
         self.TRAIN_VISUALIZER = TfVisualizer(self.LOG_DIR, 'train')
         self.TEST_VISUALIZER = TfVisualizer(self.LOG_DIR, 'test')
@@ -169,7 +176,7 @@ class Trainer(object):
             self.optimizer.zero_grad()
 
             with torch.autograd.set_detect_anomaly(True):
-                total_loss, loss_dict = self.process_batch(batch_data_label)
+                total_loss, loss_dict = self.process_batch(batch_data_label, batch_idx)
 
                 total_loss.backward()
 
@@ -231,7 +238,7 @@ class Trainer(object):
                     batch_data_label[key] = batch_data_label[key].cuda()
 
             with torch.no_grad():
-                total_loss, loss_dict = self.process_batch(batch_data_label,
+                total_loss, loss_dict = self.process_batch(batch_data_label, batch_idx,
                                                            postprocess=True)
 
             # Accumulate statistics and print out
@@ -243,6 +250,11 @@ class Trainer(object):
         for key in sorted(stat_dict.keys()):
             print('%s: %f' % (key, stat_dict[key] / cnt),
                   end=' ')
+        self.feat_loss.append(stat_dict['feat_loss'] / cnt)
+        self.nnl_loss.append(stat_dict['nnl_loss'] / cnt)
+        self.param_loss.append(stat_dict['param_loss'] / cnt)
+        self.miou.append(stat_dict['miou'] / cnt)
+        self.type_miou.append(stat_dict['type_miou'] / cnt)
         
         print()
         # Log statistics
@@ -304,9 +316,35 @@ class Trainer(object):
                         save_dict,
                         os.path.join(self.LOG_DIR,
                                      'checkpoint_eval%d.tar' % epoch))
+                    
+        # figure
+        plt.plot(self.feat_loss)
+        plt.title('feat_loss')
+        plt.savefig(os.path.join(self.LOG_DIR, 'feat_loss.png'))
+        plt.cla()
+
+        plt.plot(self.nnl_loss)
+        plt.title('nnl_loss')
+        plt.savefig(os.path.join(self.LOG_DIR, 'nnl_loss.png'))
+        plt.cla()
+
+        plt.plot(self.param_loss)
+        plt.title('param_loss')
+        plt.savefig(os.path.join(self.LOG_DIR, 'param_loss.png'))
+        plt.cla()
+
+        plt.plot(self.miou)
+        plt.title('miou')
+        plt.savefig(os.path.join(self.LOG_DIR, 'miou.png'))
+        plt.cla()
+
+        plt.plot(self.type_miou)
+        plt.title('type_miou')
+        plt.savefig(os.path.join(self.LOG_DIR, 'type_miou.png'))
+        plt.cla()
 
 
-if __name__ == '__main__':
-    FLAGS = build_option()
-    trainer = Trainer(FLAGS)
-    trainer.train()
+# if __name__ == '__main__':
+#     FLAGS = build_option()
+#     trainer = Trainer(FLAGS)
+#     trainer.train()

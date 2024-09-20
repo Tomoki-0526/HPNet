@@ -33,8 +33,8 @@ def rotation_matrix_a_to_b(A, B):
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--data_path', type=str, default='/path/to/parsenet-codebase/data/shapes')
-parser.add_argument('--save_path', type=str, default='/path/to/saved/dir')
+parser.add_argument('--data_path', type=str, default='/home/szj/data')
+parser.add_argument('--save_path', type=str, default='/home/szj/data/h5')
 
 args = parser.parse_args()
 
