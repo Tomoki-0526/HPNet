@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "7"
+os.environ['CUDA_VISIBLE_DEVICES'] = "4,5,6,7"
 from option import build_option
 from train import MyTrainer
 
@@ -8,7 +8,7 @@ class XTrainer(MyTrainer):
     def __init__(self, opt):
         super(XTrainer, self).__init__(opt=opt)
         
-        self.freeze_layers()
+        # self.freeze_layers()
 
 
     def freeze_layers(self):

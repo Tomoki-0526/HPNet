@@ -26,13 +26,6 @@ class Trainer(object):
         self.build_dataloader()
         self.build_model_optimizer()
 
-        # stat
-        self.feat_loss = []
-        self.nnl_loss = []
-        self.param_loss = []
-        self.miou = []
-        self.type_miou = []
-
         # TFBoard visualizer
         self.TRAIN_VISUALIZER = TfVisualizer(self.LOG_DIR, 'train')
         self.TEST_VISUALIZER = TfVisualizer(self.LOG_DIR, 'test')
@@ -250,11 +243,6 @@ class Trainer(object):
         for key in sorted(stat_dict.keys()):
             print('%s: %f' % (key, stat_dict[key] / cnt),
                   end=' ')
-        self.feat_loss.append(stat_dict['feat_loss'] / cnt)
-        self.nnl_loss.append(stat_dict['nnl_loss'] / cnt)
-        self.param_loss.append(stat_dict['param_loss'] / cnt)
-        self.miou.append(stat_dict['miou'] / cnt)
-        self.type_miou.append(stat_dict['type_miou'] / cnt)
         
         print()
         # Log statistics
@@ -264,8 +252,12 @@ class Trainer(object):
              for key in stat_dict},
             (self.epoch + 1) * len(self.test_dataloader) * BATCH_SIZE)
         
+        feat_loss = stat_dict['feat_loss'] / (float(batch_idx + 1))
+        nnl_loss = stat_dict['nnl_loss'] / (float(batch_idx + 1))
+        param_loss = stat_dict['param_loss'] / (float(batch_idx + 1))
         miou = stat_dict['miou'] / (float(batch_idx + 1))
-        return miou
+        type_miou = stat_dict['type_miou'] / (float(batch_idx + 1))
+        return feat_loss, nnl_loss, param_loss, miou, type_miou
 
     def train(self):
         
@@ -286,7 +278,7 @@ class Trainer(object):
             # Eval every 10 epochs
             if epoch % self.opt.eval_interval == self.opt.eval_interval - 1:
                 
-                miou = self.test_one_epoch()
+                # miou = self.test_one_epoch()
                 # Save checkpoint
                 save_dict = {
                     'epoch': epoch +
@@ -295,15 +287,15 @@ class Trainer(object):
                     #'loss': test_loss,
                 }
 
-                if miou >= max_miou:
-                    max_miou = miou
-                    try:  # with nn.DataParallel() the net is added as a submodule of DataParallel
-                        save_dict[
-                            'model_state_dict'] = self.model.module.state_dict()
-                    except:
-                        save_dict['model_state_dict'] = self.model.state_dict()
-                    torch.save(save_dict,
-                               os.path.join(self.LOG_DIR, 'checkpoint.tar'))
+                # if miou >= max_miou:
+                #     max_miou = miou
+                #     try:  # with nn.DataParallel() the net is added as a submodule of DataParallel
+                #         save_dict[
+                #             'model_state_dict'] = self.model.module.state_dict()
+                #     except:
+                #         save_dict['model_state_dict'] = self.model.state_dict()
+                #     torch.save(save_dict,
+                #                os.path.join(self.LOG_DIR, 'checkpoint.tar'))
                     
                 if epoch % self.opt.save_interval == self.opt.save_interval - 1:
                     try:  # with nn.DataParallel() the net is added as a submodule of DataParallel
@@ -316,32 +308,6 @@ class Trainer(object):
                         save_dict,
                         os.path.join(self.LOG_DIR,
                                      'checkpoint_eval%d.tar' % epoch))
-                    
-        # figure
-        plt.plot(self.feat_loss)
-        plt.title('feat_loss')
-        plt.savefig(os.path.join(self.LOG_DIR, 'feat_loss.png'))
-        plt.cla()
-
-        plt.plot(self.nnl_loss)
-        plt.title('nnl_loss')
-        plt.savefig(os.path.join(self.LOG_DIR, 'nnl_loss.png'))
-        plt.cla()
-
-        plt.plot(self.param_loss)
-        plt.title('param_loss')
-        plt.savefig(os.path.join(self.LOG_DIR, 'param_loss.png'))
-        plt.cla()
-
-        plt.plot(self.miou)
-        plt.title('miou')
-        plt.savefig(os.path.join(self.LOG_DIR, 'miou.png'))
-        plt.cla()
-
-        plt.plot(self.type_miou)
-        plt.title('type_miou')
-        plt.savefig(os.path.join(self.LOG_DIR, 'type_miou.png'))
-        plt.cla()
 
 
 # if __name__ == '__main__':
