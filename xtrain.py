@@ -1,5 +1,4 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = "5,6,7" # multi GPUs for training, single for test
 from option import build_option
 from train import MyTrainer
 
