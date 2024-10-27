@@ -9,7 +9,7 @@ max_epoch=300
 val_skip=1
 
 if [ $train_flag -eq 0 ]; then
-    python -B xtrain.py \
+    python xtrain.py \
         --data_path="${data_path}" \
         --checkpoint_path="${checkpoint_path}" \
         --log_dir="${log_dir}" \
@@ -17,7 +17,7 @@ if [ $train_flag -eq 0 ]; then
         --max_epoch="${max_epoch}"
 else
     checkpoint_path="/home/szj/HPNet/log/tomoki/checkpoint_eval299.tar"
-    python -B xtrain.py \
+    python xtrain.py \
         --data_path="${data_path}" \
         --checkpoint_path="${checkpoint_path}" \
         --log_dir="${log_dir}" \
