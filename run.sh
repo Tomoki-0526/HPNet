@@ -2,7 +2,7 @@
 
 train_flag=0
 
-data_path="/home/szj/data/h5"
+data_path="/home/szj/HPNet/data/synthetic/h5"
 checkpoint_path="/home/szj/HPNet/log/pretrained_models/abc_normal.tar"
 log_dir="./log/tomoki"
 max_epoch=300
