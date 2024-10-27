@@ -17,8 +17,8 @@ if [ $train_flag -eq 0 ]; then
         --max_epoch="${max_epoch}" \
         --vis
 else
-    checkpoint_path="/home/szj/HPNet/log/tomoki"
-    python -B xtest.py \
+    checkpoint_path="/home/szj/HPNet/log/tomoki/checkpoint_eval299.tar"
+    python -B xtrain.py \
         --data_path="${data_path}" \
         --checkpoint_path="${checkpoint_path}" \
         --log_dir="${log_dir}" \

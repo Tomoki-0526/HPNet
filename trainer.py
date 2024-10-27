@@ -26,6 +26,13 @@ class Trainer(object):
         self.build_dataloader()
         self.build_model_optimizer()
 
+        # stat
+        self.feat_loss = []
+        self.nnl_loss = []
+        self.param_loss = []
+        self.miou = []
+        self.type_miou = []
+
         # TFBoard visualizer
         self.TRAIN_VISUALIZER = TfVisualizer(self.LOG_DIR, 'train')
         self.TEST_VISUALIZER = TfVisualizer(self.LOG_DIR, 'test')
@@ -159,6 +166,8 @@ class Trainer(object):
         self.model.train()
         data_time = time.time()
         iter_time_start = time.time()
+        cnt = 0
+
         for batch_idx, batch_data_label in enumerate(self.train_dataloader):
             now = cuda_time()
             stat_dict['data_time'] += time.time() - data_time
@@ -181,6 +190,7 @@ class Trainer(object):
             for key in loss_dict:
                 if key not in stat_dict: stat_dict[key] = 0
                 stat_dict[key] += loss_dict[key].item()
+            cnt += len(batch_data_label['index'])
 
             batch_interval = 50
             BATCH_SIZE = self.train_dataloader.batch_size
@@ -215,6 +225,12 @@ class Trainer(object):
                 print()
 
             data_time = time.time()
+
+        self.feat_loss.append(stat_dict['feat_loss'] / cnt)
+        self.nnl_loss.append(stat_dict['nnl_loss'] / cnt)
+        self.param_loss.append(stat_dict['param_loss'] / cnt)
+        self.miou.append(stat_dict['miou'] / cnt)
+        self.type_miou.append(stat_dict['type_miou'] / cnt)
 
     def test_one_epoch(self):
 
@@ -252,12 +268,7 @@ class Trainer(object):
              for key in stat_dict},
             (self.epoch + 1) * len(self.test_dataloader) * BATCH_SIZE)
         
-        feat_loss = stat_dict['feat_loss'] / (float(batch_idx + 1))
-        nnl_loss = stat_dict['nnl_loss'] / (float(batch_idx + 1))
-        param_loss = stat_dict['param_loss'] / (float(batch_idx + 1))
-        miou = stat_dict['miou'] / (float(batch_idx + 1))
-        type_miou = stat_dict['type_miou'] / (float(batch_idx + 1))
-        return feat_loss, nnl_loss, param_loss, miou, type_miou
+        return self.miou
 
     def train(self):
         
@@ -308,6 +319,32 @@ class Trainer(object):
                         save_dict,
                         os.path.join(self.LOG_DIR,
                                      'checkpoint_eval%d.tar' % epoch))
+                    
+        # figure
+        plt.plot(self.feat_loss)
+        plt.title('feat_loss')
+        plt.savefig(os.path.join(self.LOG_DIR, 'feat_loss.png'))
+        plt.cla()
+
+        plt.plot(self.nnl_loss)
+        plt.title('nnl_loss')
+        plt.savefig(os.path.join(self.LOG_DIR, 'nnl_loss.png'))
+        plt.cla()
+
+        plt.plot(self.param_loss)
+        plt.title('param_loss')
+        plt.savefig(os.path.join(self.LOG_DIR, 'param_loss.png'))
+        plt.cla()
+
+        plt.plot(self.miou)
+        plt.title('miou')
+        plt.savefig(os.path.join(self.LOG_DIR, 'miou.png'))
+        plt.cla()
+
+        plt.plot(self.type_miou)
+        plt.title('type_miou')
+        plt.savefig(os.path.join(self.LOG_DIR, 'type_miou.png'))
+        plt.cla()
 
 
 # if __name__ == '__main__':
