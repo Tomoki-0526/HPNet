@@ -319,32 +319,33 @@ class Trainer(object):
                         save_dict,
                         os.path.join(self.LOG_DIR,
                                      'checkpoint_eval%d.tar' % epoch))
-                    
+
+        if not self.opt.eval:        
         # figure
-        plt.plot(self.feat_loss)
-        plt.title('feat_loss')
-        plt.savefig(os.path.join(self.LOG_DIR, 'feat_loss.png'))
-        plt.cla()
+            plt.plot(self.feat_loss)
+            plt.title('feat_loss')
+            plt.savefig(os.path.join(self.LOG_DIR, 'feat_loss.png'))
+            plt.cla()
 
-        plt.plot(self.nnl_loss)
-        plt.title('nnl_loss')
-        plt.savefig(os.path.join(self.LOG_DIR, 'nnl_loss.png'))
-        plt.cla()
+            plt.plot(self.nnl_loss)
+            plt.title('nnl_loss')
+            plt.savefig(os.path.join(self.LOG_DIR, 'nnl_loss.png'))
+            plt.cla()
 
-        plt.plot(self.param_loss)
-        plt.title('param_loss')
-        plt.savefig(os.path.join(self.LOG_DIR, 'param_loss.png'))
-        plt.cla()
+            plt.plot(self.param_loss)
+            plt.title('param_loss')
+            plt.savefig(os.path.join(self.LOG_DIR, 'param_loss.png'))
+            plt.cla()
 
-        plt.plot(self.miou)
-        plt.title('miou')
-        plt.savefig(os.path.join(self.LOG_DIR, 'miou.png'))
-        plt.cla()
+            plt.plot(self.miou)
+            plt.title('miou')
+            plt.savefig(os.path.join(self.LOG_DIR, 'miou.png'))
+            plt.cla()
 
-        plt.plot(self.type_miou)
-        plt.title('type_miou')
-        plt.savefig(os.path.join(self.LOG_DIR, 'type_miou.png'))
-        plt.cla()
+            plt.plot(self.type_miou)
+            plt.title('type_miou')
+            plt.savefig(os.path.join(self.LOG_DIR, 'type_miou.png'))
+            plt.cla()
 
 
 # if __name__ == '__main__':
