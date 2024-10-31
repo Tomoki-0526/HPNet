@@ -56,7 +56,7 @@ len_ = len(gt_points)
 for i in range(len_):
     print(i) 
 
-    filename = '%05d.h5' % i
+    filename = '%03d.h5' % i
 
     P = new_gt_points[i]
 
