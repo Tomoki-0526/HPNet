@@ -344,7 +344,7 @@ class PrimitivesEmbeddingDGCNGn(nn.Module):
         if self.mode == 5:
             return embedding, type_per_point, normal_per_point, param_per_point, subidx.squeeze(1)
         else:
-            return embedding, type_per_point, param_per_point, subidx.squeeze(1)
+            return embedding, type_per_point, None, param_per_point, subidx.squeeze(1)
 
 
 class PrimitiveNet(nn.Module):
@@ -359,8 +359,8 @@ class PrimitiveNet(nn.Module):
                                                     opt=opt,
                                                     emb_size=self.opt.out_dim,
                                                     num_primitives=10,
-                                                    mode=5,
-                                                    num_channels=6,
+                                                    mode=0,
+                                                    num_channels=3,
                                                     )
     
     def forward(self, xyz, normal, inds=None, postprocess=False):
