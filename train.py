@@ -111,7 +111,7 @@ class MyTrainer(Trainer):
             inst_label = cluster_pred.cpu().numpy().T
             labeled_cloud = np.concatenate((xyz, prim_type, inst_label), axis=1)
             vis_path = os.path.join(self.VIS_DIR, '{}.txt'.format(str(batch_idx).zfill(3)))
-            print('save cloud to: {}'.format(vis_path))
+            print(f'save cloud to: {vis_path}')
             np.savetxt(vis_path, labeled_cloud)
  
         return total_loss, loss_dict
