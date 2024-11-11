@@ -6,3 +6,5 @@ visualization/
 
 *.log
 *.service
+
+run.sh
