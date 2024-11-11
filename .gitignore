@@ -1,7 +1,7 @@
 __pycache__/
 checkpoints/
 data/
-log/tomoki
+log/
 visualization/
 
 *.log
