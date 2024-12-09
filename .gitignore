@@ -2,5 +2,6 @@ __pycache__
 checkpoints/
 data/
 visualization/
+log/
 
 *.log
