@@ -33,12 +33,12 @@ def rotation_matrix_a_to_b(A, B):
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--data_path', type=str, default='/home/szj/data')
-parser.add_argument('--save_path', type=str, default='/home/szj/data/h5')
+parser.add_argument('--data_path', type=str, default='/home/szj/HPNet/data/predict')
+parser.add_argument('--save_path', type=str, default='/home/szj/HPNet/data/predict/h5')
 
 args = parser.parse_args()
 
-data_path = os.path.join(args.data_path, 'train_data.h5')
+data_path = os.path.join(args.data_path, 'real_column.h5')
 
 with h5py.File(data_path, 'r') as hf:
     gt_points = np.array(hf.get("points")).astype(np.float64)
@@ -56,7 +56,7 @@ len_ = len(gt_points)
 for i in range(len_):
     print(i) 
 
-    filename = '%05d.h5' % i
+    filename = '%03d.h5' % i
 
     P = new_gt_points[i]
 
