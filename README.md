@@ -59,3 +59,8 @@ If you find this repository useful in your research, please cite:
   year={2021}
 }
 ```
+
+### Tips
+
+[sphere_c, sphere_r, plane_a, plane_d, cylinder_a, cylinder_c, cylinder_r, cone_a, cone_c, cone_theta].  
+plane = 1; cone = 3; cylinder = 4; sphere = 5; open b-spline = 2, 8; close b-spline = 6, 7, 9.  
