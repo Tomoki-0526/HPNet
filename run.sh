@@ -5,8 +5,8 @@ val_skip=1
 
 if [ $train_flag -eq 0 ]; then
     log_dir="./log/finetune"
-    max_epoch=1500
-    data_path="/home/szj/HPNet/data/synthetic/h5"
+    max_epoch=300
+    data_path="/home/szj/HPNet/data/finetune/h5"
     checkpoint_path="/home/szj/HPNet/log/pretrained_models/abc_normal.tar"
     log_file="/home/szj/HPNet/log/finetune_$(date +%Y-%m-%d_%H:%M:%S).log" && touch "$log_file"
     CUDA_VISIBLE_DEVICES=4,5,6,7 nohup \
@@ -19,9 +19,9 @@ if [ $train_flag -eq 0 ]; then
         > "${log_file}" 2>&1 &
 elif [ $train_flag -eq 1 ]; then
     log_dir="./log/predict"
-    max_epoch=300
-    data_path="/home/szj/HPNet/data/predict/h5"
-    checkpoint_path="/home/szj/HPNet/log/pretrained_models/abc_normal.tar"
+    max_epoch=500
+    data_path="/home/szj/HPNet/data/finetune/h5"
+    checkpoint_path="/home/szj/HPNet/log/finetune/checkpoint_eval299.tar"
     log_file="/home/szj/HPNet/log/predict_$(date +%Y-%m-%d_%H:%M:%S).log" && touch "$log_file"
     CUDA_VISIBLE_DEVICES=7 nohup \
         python xtrain.py \
