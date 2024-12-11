@@ -33,8 +33,8 @@ def rotation_matrix_a_to_b(A, B):
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--data_path', type=str, default='/path/to/parsenet-codebase/data/shapes')
-parser.add_argument('--save_path', type=str, default='/path/to/saved/dir')
+parser.add_argument('--data_path', type=str, default='/home/szj/HPNet/data/real')
+parser.add_argument('--save_path', type=str, default='/home/szj/HPNet/data/real/h5')
 
 args = parser.parse_args()
 
@@ -56,7 +56,7 @@ len_ = len(gt_points)
 for i in range(len_):
     print(i) 
 
-    filename = '%05d.h5' % i
+    filename = '%03d.h5' % i
 
     P = new_gt_points[i]
 

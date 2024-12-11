@@ -13,7 +13,7 @@ import scipy.stats as stats
 
 class MyTrainer(Trainer):
 
-    def process_batch(self, batch_data_label, postprocess=False):
+    def process_batch(self, batch_data_label, batch_idx, postprocess=False):
  
         inputs_xyz_th = (batch_data_label['gt_pc']).float().cuda().permute(0,2,1)
         inputs_n_th = (batch_data_label['gt_normal']).float().cuda().permute(0,2,1)
@@ -104,6 +104,15 @@ class MyTrainer(Trainer):
             loss_dict['miou'] = miou
             miou = compute_type_miou_abc(type_per_point, T_gt, cluster_pred, I_gt)
             loss_dict['type_miou'] = miou
+
+            # visualization
+            xyz = inputs_xyz_sub.cpu().numpy().squeeze(0).T
+            prim_type = type_per_point.cpu().numpy().squeeze(0).argmax(1).reshape(-1, 1)
+            inst_label = cluster_pred.cpu().numpy().T
+            labeled_cloud = np.concatenate((xyz, prim_type, inst_label), axis=1)
+            vis_path = os.path.join(self.VIS_DIR, '{}.txt'.format(str(batch_idx).zfill(3)))
+            print(f'save cloud to: {vis_path}')
+            np.savetxt(vis_path, labeled_cloud)
  
         return total_loss, loss_dict
         

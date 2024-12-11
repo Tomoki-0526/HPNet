@@ -26,6 +26,13 @@ class Trainer(object):
         self.build_dataloader()
         self.build_model_optimizer()
 
+        # stat
+        self.feat_loss = []
+        self.nnl_loss = []
+        self.param_loss = []
+        self.miou = []
+        self.type_miou = []
+
         # TFBoard visualizer
         self.TRAIN_VISUALIZER = TfVisualizer(self.LOG_DIR, 'train')
         self.TEST_VISUALIZER = TfVisualizer(self.LOG_DIR, 'test')
@@ -159,6 +166,8 @@ class Trainer(object):
         self.model.train()
         data_time = time.time()
         iter_time_start = time.time()
+        cnt = 0
+
         for batch_idx, batch_data_label in enumerate(self.train_dataloader):
             now = cuda_time()
             stat_dict['data_time'] += time.time() - data_time
@@ -169,7 +178,7 @@ class Trainer(object):
             self.optimizer.zero_grad()
 
             with torch.autograd.set_detect_anomaly(True):
-                total_loss, loss_dict = self.process_batch(batch_data_label)
+                total_loss, loss_dict = self.process_batch(batch_data_label, batch_idx)
 
                 total_loss.backward()
 
@@ -181,6 +190,7 @@ class Trainer(object):
             for key in loss_dict:
                 if key not in stat_dict: stat_dict[key] = 0
                 stat_dict[key] += loss_dict[key].item()
+            cnt += len(batch_data_label['index'])
 
             batch_interval = 50
             BATCH_SIZE = self.train_dataloader.batch_size
@@ -216,6 +226,12 @@ class Trainer(object):
 
             data_time = time.time()
 
+        self.feat_loss.append(stat_dict['feat_loss'] / cnt)
+        self.nnl_loss.append(stat_dict['nnl_loss'] / cnt)
+        self.param_loss.append(stat_dict['param_loss'] / cnt)
+        self.miou.append(stat_dict['miou'] / cnt)
+        self.type_miou.append(stat_dict['type_miou'] / cnt)
+
     def test_one_epoch(self):
 
         stat_dict = {}
@@ -231,7 +247,7 @@ class Trainer(object):
                     batch_data_label[key] = batch_data_label[key].cuda()
 
             with torch.no_grad():
-                total_loss, loss_dict = self.process_batch(batch_data_label,
+                total_loss, loss_dict = self.process_batch(batch_data_label, batch_idx,
                                                            postprocess=True)
 
             # Accumulate statistics and print out
@@ -252,8 +268,7 @@ class Trainer(object):
              for key in stat_dict},
             (self.epoch + 1) * len(self.test_dataloader) * BATCH_SIZE)
         
-        miou = stat_dict['miou'] / (float(batch_idx + 1))
-        return miou
+        return self.miou
 
     def train(self):
         
@@ -274,7 +289,7 @@ class Trainer(object):
             # Eval every 10 epochs
             if epoch % self.opt.eval_interval == self.opt.eval_interval - 1:
                 
-                miou = self.test_one_epoch()
+                # miou = self.test_one_epoch()
                 # Save checkpoint
                 save_dict = {
                     'epoch': epoch +
@@ -283,15 +298,15 @@ class Trainer(object):
                     #'loss': test_loss,
                 }
 
-                if miou >= max_miou:
-                    max_miou = miou
-                    try:  # with nn.DataParallel() the net is added as a submodule of DataParallel
-                        save_dict[
-                            'model_state_dict'] = self.model.module.state_dict()
-                    except:
-                        save_dict['model_state_dict'] = self.model.state_dict()
-                    torch.save(save_dict,
-                               os.path.join(self.LOG_DIR, 'checkpoint.tar'))
+                # if miou >= max_miou:
+                #     max_miou = miou
+                #     try:  # with nn.DataParallel() the net is added as a submodule of DataParallel
+                #         save_dict[
+                #             'model_state_dict'] = self.model.module.state_dict()
+                #     except:
+                #         save_dict['model_state_dict'] = self.model.state_dict()
+                #     torch.save(save_dict,
+                #                os.path.join(self.LOG_DIR, 'checkpoint.tar'))
                     
                 if epoch % self.opt.save_interval == self.opt.save_interval - 1:
                     try:  # with nn.DataParallel() the net is added as a submodule of DataParallel
@@ -305,8 +320,35 @@ class Trainer(object):
                         os.path.join(self.LOG_DIR,
                                      'checkpoint_eval%d.tar' % epoch))
 
+        if not self.opt.eval:        
+        # figure
+            plt.plot(self.feat_loss)
+            plt.title('feat_loss')
+            plt.savefig(os.path.join(self.LOG_DIR, 'feat_loss.png'))
+            plt.cla()
 
-if __name__ == '__main__':
-    FLAGS = build_option()
-    trainer = Trainer(FLAGS)
-    trainer.train()
+            plt.plot(self.nnl_loss)
+            plt.title('nnl_loss')
+            plt.savefig(os.path.join(self.LOG_DIR, 'nnl_loss.png'))
+            plt.cla()
+
+            plt.plot(self.param_loss)
+            plt.title('param_loss')
+            plt.savefig(os.path.join(self.LOG_DIR, 'param_loss.png'))
+            plt.cla()
+
+            plt.plot(self.miou)
+            plt.title('miou')
+            plt.savefig(os.path.join(self.LOG_DIR, 'miou.png'))
+            plt.cla()
+
+            plt.plot(self.type_miou)
+            plt.title('type_miou')
+            plt.savefig(os.path.join(self.LOG_DIR, 'type_miou.png'))
+            plt.cla()
+
+
+# if __name__ == '__main__':
+#     FLAGS = build_option()
+#     trainer = Trainer(FLAGS)
+#     trainer.train()
